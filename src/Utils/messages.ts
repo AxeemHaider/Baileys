@@ -307,6 +307,23 @@ export const generateWAMessageContent = async(
 			(message.disappearingMessagesInChat ? WA_DEFAULT_EPHEMERAL : 0) :
 			message.disappearingMessagesInChat
 		m = prepareDisappearingMessageSettingContent(exp)
+	} else if('buttonReply' in message) {
+		switch (message.type) {
+		case 'template':
+			m.templateButtonReplyMessage = {
+				selectedDisplayText: message.buttonReply.displayText,
+				selectedId: message.buttonReply.id,
+				selectedIndex: message.buttonReply.index,
+			}
+			break
+		case 'plain':
+			m.buttonsResponseMessage = {
+				selectedButtonId: message.buttonReply.id,
+				selectedDisplayText: message.buttonReply.displayText,
+				type: proto.ButtonsResponseMessage.ButtonsResponseMessageType.DISPLAY_TEXT,
+			}
+			break
+		}
 	} else {
 		m = await prepareWAMessageMedia(
 			message,
@@ -653,7 +670,7 @@ export const downloadMediaMessage = async(
 
 /** Checks whether the given message is a media message; if it is returns the inner content */
 export const assertMediaContent = (content: proto.IMessage) => {
-	content = normalizeMessageContent(content)
+	content = extractMessageContent(content)
 	const mediaContent = content?.documentMessage
 		|| content?.imageMessage
 		|| content?.videoMessage

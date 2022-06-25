@@ -93,12 +93,19 @@ export type AnyMediaMessageContent = (
         seconds?: number
     } | ({
         sticker: WAMediaUpload
+        isAnimated?: boolean
     } & WithDimensions) | ({
         document: WAMediaUpload
         mimetype: string
         fileName?: string
     } & Buttonable & Templatable)) &
     { mimetype?: string }
+
+export type ButtonReplyInfo = {
+    displayText: string
+    id: string
+    index: number
+}
 
 export type AnyRegularMessageContent = (
     ({
@@ -117,6 +124,9 @@ export type AnyRegularMessageContent = (
         location: WALocationMessage
     } | {
         react: proto.IReactionMessage
+    } | {
+        buttonReply: ButtonReplyInfo
+        type: 'template' | 'plain'
     }
 ) & ViewOnce
 
@@ -143,6 +153,8 @@ export type MessageRelayOptions = MinimalRelayOptions & {
     participant?: string
     /** additional attributes to add to the WA binary node */
     additionalAttributes?: { [_: string]: string }
+    /** should we use the devices cache, or fetch afresh from the server; default assumed to be "true" */
+    useUserDevicesCache?: boolean
 }
 
 export type MiscMessageGenerationOptions = MinimalRelayOptions & {
